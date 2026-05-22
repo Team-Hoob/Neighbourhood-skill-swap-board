@@ -1,0 +1,88 @@
+.dashboard-page {
+  min-height: calc(100vh - var(--navbar-height));
+  padding-top: calc(var(--navbar-height) + var(--space-12));
+  padding-bottom: var(--space-16);
+  background-color: var(--cream);
+}
+
+.dashboard-container {
+  max-width: var(--container-md);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.dashboard-welcome {
+  background: var(--white);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-10) var(--space-12);
+  animation: fadeUp var(--duration-slow) var(--ease-out) both;
+}
+
+.dashboard-welcome h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--ink);
+  margin-bottom: var(--space-2);
+}
+
+.dashboard-welcome .dashboard-neighbourhood {
+  font-size: var(--text-base);
+  color: var(--muted);
+  margin-bottom: var(--space-8);
+}
+
+.dashboard-neighbourhood span {
+  color: var(--sage);
+  font-weight: 600;
+}
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.dashboard-card {
+  background: var(--cream);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  text-align: center;
+  border: 1.5px solid var(--border-light);
+  transition: box-shadow var(--duration-base) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+
+.dashboard-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.dashboard-card .card-emoji {
+  font-size: 2rem;
+  margin-bottom: var(--space-2);
+}
+
+.dashboard-card p {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.dashboard-logout {
+  padding: var(--space-3) var(--space-8);
+  background: transparent;
+  color: var(--terracotta);
+  border: 1.5px solid var(--terracotta);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: background var(--duration-base) var(--ease-out),
+              color var(--duration-base) var(--ease-out);
+}
+
+.dashboard-logout:hover {
+  background: var(--terracotta);
+  color: var(--white);
+}

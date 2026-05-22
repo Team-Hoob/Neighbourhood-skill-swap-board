@@ -1,0 +1,2 @@
+/* LoginPage uses the same auth styles — just reuse RegisterPage.css */
+@import './RegisterPage.css';
