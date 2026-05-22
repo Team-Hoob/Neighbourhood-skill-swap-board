@@ -1,0 +1,38 @@
+/* =========================================
+   Avatar Component
+   ========================================= */
+
+.ss-avatar {
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: var(--terracotta-bg);
+  border: 2px solid var(--border-light);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ss-avatar--xs { width: 28px; height: 28px; }
+.ss-avatar--sm { width: 36px; height: 36px; }
+.ss-avatar--md { width: 48px; height: 48px; }
+.ss-avatar--lg { width: 72px; height: 72px; }
+
+.ss-avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ss-avatar__initial {
+  font-weight: 700;
+  color: var(--terracotta-dark);
+  font-family: var(--font-display);
+  line-height: 1;
+  user-select: none;
+}
+
+.ss-avatar--xs .ss-avatar__initial { font-size: 0.65rem; }
+.ss-avatar--sm .ss-avatar__initial { font-size: 0.8rem; }
+.ss-avatar--md .ss-avatar__initial { font-size: 1.1rem; }
+.ss-avatar--lg .ss-avatar__initial { font-size: 1.6rem; }

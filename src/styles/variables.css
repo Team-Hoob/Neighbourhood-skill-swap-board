@@ -1,0 +1,96 @@
+/* =========================================
+   SkillSwap Design Tokens
+   ========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap');
+
+:root {
+  /* ── Colors ── */
+  --cream:        #F5F0E8;
+  --cream-dark:   #EDE7D9;
+  --paper:        #E8E0CF;
+  --white:        #FDFAF5;
+
+  --terracotta:   #D4622A;
+  --terracotta-light: #E8845A;
+  --terracotta-dark:  #B04D1E;
+  --terracotta-bg:    #FAE8DF;
+
+  --sage:         #5A7A5C;
+  --sage-light:   #7A9E7C;
+  --sage-dark:    #3E5C40;
+  --sage-bg:      #E4EDE4;
+
+  --amber:        #E8A23A;
+  --amber-light:  #F5C46A;
+  --amber-bg:     #FDF3DF;
+
+  --charcoal:     #2C2C2C;
+  --ink:          #1A1A1A;
+  --muted:        #8A8070;
+  --muted-light:  #B0A898;
+  --border:       #D8D0C0;
+  --border-light: #EAE4D8;
+
+  /* ── Typography ── */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --text-xs:   0.75rem;    /* 12px */
+  --text-sm:   0.875rem;   /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-md:   1.125rem;   /* 18px */
+  --text-lg:   1.25rem;    /* 20px */
+  --text-xl:   1.5rem;     /* 24px */
+  --text-2xl:  2rem;       /* 32px */
+  --text-3xl:  2.5rem;     /* 40px */
+  --text-4xl:  3.25rem;    /* 52px */
+  --text-5xl:  4rem;       /* 64px */
+
+  /* ── Spacing ── */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ── Border Radius ── */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm:  0 1px 3px rgba(44,44,44,0.08), 0 1px 2px rgba(44,44,44,0.04);
+  --shadow-md:  0 4px 12px rgba(44,44,44,0.10), 0 2px 4px rgba(44,44,44,0.06);
+  --shadow-lg:  0 12px 32px rgba(44,44,44,0.12), 0 4px 8px rgba(44,44,44,0.06);
+  --shadow-xl:  0 24px 48px rgba(44,44,44,0.14), 0 8px 16px rgba(44,44,44,0.08);
+  --shadow-terracotta: 0 8px 24px rgba(212,98,42,0.25);
+  --shadow-sage: 0 8px 24px rgba(90,122,92,0.20);
+
+  /* ── Transitions ── */
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:    cubic-bezier(0.4, 0, 1, 1);
+  --ease-inout: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:   150ms;
+  --duration-base:   250ms;
+  --duration-slow:   400ms;
+  --duration-slower: 600ms;
+
+  /* ── Layout ── */
+  --container-sm:  640px;
+  --container-md:  768px;
+  --container-lg:  1024px;
+  --container-xl:  1280px;
+  --container-2xl: 1400px;
+  --navbar-height: 68px;
+}

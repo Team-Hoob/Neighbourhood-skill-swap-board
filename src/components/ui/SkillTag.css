@@ -1,0 +1,60 @@
+/* =========================================
+   SkillTag Component
+   ========================================= */
+
+.ss-tag {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  border: 1.5px solid transparent;
+  font-family: var(--font-body);
+  transition: background var(--duration-fast),
+              border-color var(--duration-fast),
+              transform var(--duration-fast);
+
+  /* Dynamic color via CSS vars */
+  color: var(--tag-color);
+  background: rgba(var(--tag-rgb), 0.1);
+  border-color: rgba(var(--tag-rgb), 0.2);
+}
+
+/* ── Sizes ── */
+.ss-tag--sm {
+  font-size: var(--text-xs);
+  padding: 3px var(--space-3);
+  letter-spacing: 0.03em;
+}
+
+.ss-tag--md {
+  font-size: var(--text-sm);
+  padding: var(--space-2) var(--space-4);
+}
+
+/* ── Clickable ── */
+.ss-tag--clickable {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ss-tag--clickable:hover {
+  background: rgba(var(--tag-rgb), 0.18);
+  border-color: rgba(var(--tag-rgb), 0.4);
+  transform: translateY(-1px);
+}
+
+.ss-tag--clickable:active {
+  transform: translateY(0);
+}
+
+/* ── Active / selected (for filter state) ── */
+.ss-tag--active {
+  background: var(--tag-color);
+  color: white;
+  border-color: var(--tag-color);
+}
+
+.ss-tag--active:hover {
+  filter: brightness(1.1);
+  background: var(--tag-color);
+}

@@ -1,0 +1,120 @@
+/* =========================================
+   Input / Textarea Field Component
+   ========================================= */
+
+.ss-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ss-field--full { width: 100%; }
+
+/* ── Label ── */
+.ss-field__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--charcoal);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.ss-field__required {
+  color: var(--terracotta);
+  font-size: var(--text-base);
+  line-height: 1;
+}
+
+/* ── Wrapper (handles icon positioning) ── */
+.ss-field__wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Input / Textarea ── */
+.ss-field__input {
+  width: 100%;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-base);
+  color: var(--charcoal);
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background var(--duration-fast);
+  outline: none;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.ss-field__input::placeholder {
+  color: var(--muted-light);
+}
+
+.ss-field__input:hover {
+  border-color: var(--muted-light);
+}
+
+.ss-field__input:focus {
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 3px rgba(212, 98, 42, 0.12);
+  background: var(--white);
+}
+
+/* ── Error state ── */
+.ss-field__wrap--error .ss-field__input {
+  border-color: #C0392B;
+  background: #FDF8F7;
+}
+.ss-field__wrap--error .ss-field__input:focus {
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+  border-color: #C0392B;
+}
+
+/* ── Icons inside input ── */
+.ss-field__icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  font-size: var(--text-base);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ss-field__icon--left  { left: var(--space-4); }
+.ss-field__icon--right { right: var(--space-4); }
+
+.ss-field__wrap--icon-left  .ss-field__input { padding-left: 2.5rem; }
+.ss-field__wrap--icon-right .ss-field__input { padding-right: 2.5rem; }
+
+/* For textarea, icon sits at top not center */
+textarea.ss-field__input ~ .ss-field__icon {
+  top: var(--space-4);
+  transform: none;
+}
+
+/* ── Helper / error text ── */
+.ss-field__hint {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.ss-field__error {
+  font-size: var(--text-xs);
+  color: #C0392B;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* ── Disabled ── */
+.ss-field__input:disabled {
+  background: var(--cream-dark);
+  color: var(--muted);
+  cursor: not-allowed;
+  border-color: var(--border-light);
+}

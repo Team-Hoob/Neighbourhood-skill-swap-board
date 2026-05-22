@@ -1,0 +1,97 @@
+/* =========================================
+   Modal Component
+   ========================================= */
+
+.ss-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(26, 26, 26, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  animation: fadeIn var(--duration-base) var(--ease-out);
+}
+
+.ss-modal {
+  background: var(--white);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-height: calc(100vh - var(--space-8));
+  display: flex;
+  flex-direction: column;
+  animation: scaleIn var(--duration-slow) var(--ease-out);
+  overflow: hidden;
+}
+
+.ss-modal--sm { max-width: 400px; }
+.ss-modal--md { max-width: 560px; }
+.ss-modal--lg { max-width: 760px; }
+
+/* ── Header ── */
+.ss-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6) var(--space-8);
+  border-bottom: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+
+.ss-modal__title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ss-modal__close {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  background: transparent;
+  border: 1.5px solid transparent;
+  transition: color var(--duration-fast), background var(--duration-fast), border-color var(--duration-fast);
+  flex-shrink: 0;
+}
+.ss-modal__close:hover {
+  color: var(--charcoal);
+  background: var(--cream-dark);
+  border-color: var(--border);
+}
+
+/* ── Body ── */
+.ss-modal__body {
+  padding: var(--space-6) var(--space-8);
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ── Footer ── */
+.ss-modal__footer {
+  padding: var(--space-5) var(--space-8);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-shrink: 0;
+  background: var(--cream);
+}
+
+@media (max-width: 480px) {
+  .ss-modal__header,
+  .ss-modal__body,
+  .ss-modal__footer { padding-left: var(--space-5); padding-right: var(--space-5); }
+
+  .ss-modal__footer { flex-direction: column-reverse; }
+  .ss-modal__footer > * { width: 100%; }
+}
