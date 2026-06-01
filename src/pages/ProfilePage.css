@@ -608,3 +608,50 @@
   .profile-tabs   { width: 100%; justify-content: center; }
   .skills-section { padding: 1.25rem; }
 }
+
+.edit-location-form {
+  padding: 1rem 1.5rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+
+.edit-section-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.edit-input {
+  padding: 0.6rem 0.9rem;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.edit-input:focus {
+  border-color: #C0692A;
+}
+
+.edit-select {
+  cursor: pointer;
+}
+
+.hero-pincode, .hero-apartment {
+  font-size: 0.85rem;
+  color: #ccc;
+  margin-top: 0.25rem;
+  display: block;
+}

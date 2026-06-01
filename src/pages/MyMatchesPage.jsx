@@ -1,76 +1,53 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../auth/AuthContext';
+import { supabase } from '../supabaseClient';
 import './MyMatchesPage.css';
-
-// Mock data — swap with useApi('/matches/me') when Shreyas's backend is ready
-// const { data: matches, loading } = useApi('/matches/me');
-const MOCK_MATCHES = [
-  {
-    id: 1,
-    score: 94,
-    them: { name: 'Priya Sharma', neighbourhood: 'Bandra West', avatar: null, initials: 'PS' },
-    yourOffer: 'Web development & React tutoring',
-    theirOffer: 'Carnatic music lessons',
-    yourNeed: 'Music lessons for my daughter',
-    theirNeed: 'Help building a portfolio website',
-    category: 'tech',
-    matched: '2 hours ago',
-  },
-  {
-    id: 2,
-    score: 87,
-    them: { name: 'Arjun Mehta', neighbourhood: 'Powai', avatar: null, initials: 'AM' },
-    yourOffer: 'Excel & data analysis help',
-    theirOffer: 'Weekend yoga sessions',
-    yourNeed: 'Fitness coaching',
-    theirNeed: 'Office productivity tools',
-    category: 'fitness',
-    matched: '5 hours ago',
-  },
-  {
-    id: 3,
-    score: 79,
-    them: { name: 'Meera Iyer', neighbourhood: 'Koramangala', avatar: null, initials: 'MI' },
-    yourOffer: 'Python programming basics',
-    theirOffer: 'South Indian cooking classes',
-    yourNeed: 'Learn to cook traditional recipes',
-    theirNeed: 'Learn Python for data science',
-    category: 'cooking',
-    matched: '1 day ago',
-  },
-  {
-    id: 4,
-    score: 71,
-    them: { name: 'Ravi Kulkarni', neighbourhood: 'Andheri East', avatar: null, initials: 'RK' },
-    yourOffer: 'Photography & editing',
-    theirOffer: 'Hindi language tutoring',
-    yourNeed: 'Improve conversational Hindi',
-    theirNeed: 'Product photography for shop',
-    category: 'language',
-    matched: '2 days ago',
-  },
-  {
-    id: 5,
-    score: 65,
-    them: { name: 'Sunita Patel', neighbourhood: 'Vile Parle', avatar: null, initials: 'SP' },
-    yourOffer: 'Graphic design & Canva',
-    theirOffer: 'Gardening & plant care',
-    yourNeed: 'Balcony garden setup',
-    theirNeed: 'Social media design help',
-    category: 'crafts',
-    matched: '3 days ago',
-  },
-];
+import ReviewModal from '../components/ReviewModal';
 
 const SCORE_COLORS = {
-  high:   { stroke: '#5A7A5C', label: 'Excellent Match',  bg: 'rgba(90,122,92,0.08)'  },
-  medium: { stroke: '#E8A23A', label: 'Good Match',       bg: 'rgba(232,162,58,0.08)' },
-  low:    { stroke: '#D4622A', label: 'Possible Match',   bg: 'rgba(212,98,42,0.08)'  },
+  high:   { stroke: '#5A7A5C', label: 'Excellent Match', bg: 'rgba(90,122,92,0.08)'  },
+  medium: { stroke: '#E8A23A', label: 'Good Match',      bg: 'rgba(232,162,58,0.08)' },
+  low:    { stroke: '#D4622A', label: 'Possible Match',  bg: 'rgba(212,98,42,0.08)'  },
 };
 
 function getScoreTier(score) {
   if (score >= 80) return 'high';
   if (score >= 65) return 'medium';
   return 'low';
+}
+
+function MatchRating({ userId }) {
+  const [rating, setRating] = useState(null);
+  const [count, setCount]   = useState(0);
+
+  useEffect(() => {
+    if (!userId) return;
+    async function fetchRating() {
+      const { data } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('reviewed_id', userId);
+      if (data && data.length > 0) {
+        const avg = data.reduce((s, r) => s + r.rating, 0) / data.length;
+        setRating(avg.toFixed(1));
+        setCount(data.length);
+      }
+    }
+    fetchRating();
+  }, [userId]);
+
+  if (!rating) return <span style={{ color: '#aaa', fontSize: '0.8rem' }}>No reviews yet</span>;
+
+  const full  = Math.floor(rating);
+  const empty = 5 - full;
+
+  return (
+    <span style={{ fontSize: '0.85rem' }}>
+      <span style={{ color: '#E8A23A' }}>{'★'.repeat(full)}{'☆'.repeat(empty)}</span>
+      <span style={{ color: '#E8A23A', marginLeft: '0.3rem', fontWeight: 600 }}>{rating}</span>
+      <span style={{ color: '#aaa', fontSize: '0.75rem' }}> ({count} reviews)</span>
+    </span>
+  );
 }
 
 function ScoreRing({ score, size = 72 }) {
@@ -89,42 +66,58 @@ function ScoreRing({ score, size = 72 }) {
 
   return (
     <svg width={size} height={size} className="score-ring-svg">
-      <circle
-        cx={size / 2} cy={size / 2} r={radius}
-        fill="none" stroke="#EDE7D9" strokeWidth={7}
-      />
-      <circle
-        cx={size / 2} cy={size / 2} r={radius}
-        fill="none"
-        stroke={stroke}
-        strokeWidth={7}
+      <circle cx={size/2} cy={size/2} r={radius}
+        fill="none" stroke="#EDE7D9" strokeWidth={7} />
+      <circle cx={size/2} cy={size/2} r={radius}
+        fill="none" stroke={stroke} strokeWidth={7}
         strokeLinecap="round"
         strokeDasharray={circumference}
         strokeDashoffset={dashOffset}
-        style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1)', transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
+        style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1)',
+          transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
       />
       <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central"
-        style={{ fontFamily: 'var(--font-body)', fontSize: size * 0.22, fontWeight: 700, fill: stroke }}>
+        style={{ fontFamily: 'var(--font-body)', fontSize: size*0.22,
+          fontWeight: 700, fill: stroke }}>
         {score}%
       </text>
     </svg>
   );
 }
 
-function MatchCard({ match, onConnect }) {
+function MatchCard({ match, onConnect, onRate }) {
   const [expanded, setExpanded] = useState(false);
   const tier = getScoreTier(match.score);
   const { label, bg } = SCORE_COLORS[tier];
+  const them = match.user;
+  const initials = them?.name
+    ? them.name.split(' ').map(n => n[0]).join('').toUpperCase()
+    : '?';
 
   return (
     <div className={`match-card tier-${tier}`} style={{ background: bg }}>
-      {/* Top bar */}
       <div className="match-card-header">
         <div className="match-user-info">
-          <div className="match-avatar">{match.them.initials}</div>
+          <div className="match-avatar">{initials}</div>
           <div>
-            <p className="match-name">{match.them.name}</p>
-            <p className="match-location">📍 {match.them.neighbourhood}</p>
+            <p className="match-name">{them?.name || 'Neighbour'}</p>
+            <p className="match-location">
+  📍 {them?.neighbourhood || 'Nearby'}
+  {match.distance_km !== null && match.distance_km !== undefined && (
+    <span style={{
+      marginLeft: '0.5rem',
+      fontSize: '0.8rem',
+      background: match.distance_km <= 5 ? '#e8f5e9' : match.distance_km <= 25 ? '#fff3e0' : '#fce4ec',
+      color: match.distance_km <= 5 ? '#2e7d32' : match.distance_km <= 25 ? '#e65100' : '#c62828',
+      padding: '0.15rem 0.5rem',
+      borderRadius: '20px',
+      fontWeight: 600
+    }}>
+      {match.distance_km <= 1 ? 'Very nearby' : `${match.distance_km.toFixed(1)} km away`}
+    </span>
+  )}
+</p>
+            <MatchRating userId={them?.id} />
           </div>
         </div>
         <div className="match-score-area">
@@ -133,42 +126,49 @@ function MatchCard({ match, onConnect }) {
         </div>
       </div>
 
-      {/* Exchange summary */}
       <div className="match-exchange">
-        <div className="exchange-row">
-          <span className="exchange-direction you">You offer</span>
-          <span className="exchange-text">{match.yourOffer}</span>
-        </div>
-        <div className="exchange-arrow">⇄</div>
-        <div className="exchange-row">
-          <span className="exchange-direction them">They offer</span>
-          <span className="exchange-text">{match.theirOffer}</span>
-        </div>
+        {match.offer_match && (
+          <>
+            <div className="exchange-row">
+              <span className="exchange-direction you">You offer</span>
+              <span className="exchange-text">
+                {match.offer_match.split('↔')[0]?.trim()}
+              </span>
+            </div>
+            <div className="exchange-arrow">⇄</div>
+            <div className="exchange-row">
+              <span className="exchange-direction them">They need</span>
+              <span className="exchange-text">
+                {match.offer_match.split('↔')[1]?.trim()}
+              </span>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Expanded needs section */}
-      {expanded && (
+      {expanded && match.need_match && (
         <div className="match-needs">
           <div className="need-row">
-            <span className="need-label">Your need:</span>
-            <span>{match.yourNeed}</span>
-          </div>
-          <div className="need-row">
-            <span className="need-label">Their need:</span>
-            <span>{match.theirNeed}</span>
+            <span className="need-label">Also matched:</span>
+            <span>{match.need_match}</span>
           </div>
         </div>
       )}
 
-      {/* Footer */}
       <div className="match-card-footer">
-        <span className="match-time">Matched {match.matched}</span>
         <div className="match-actions">
-          <button className="btn-expand" onClick={() => setExpanded(e => !e)}>
-            {expanded ? 'Show less ↑' : 'Details ↓'}
-          </button>
+          {match.need_match && (
+            <button className="btn-expand" onClick={() => setExpanded(e => !e)}>
+              {expanded ? 'Show less ↑' : 'Details ↓'}
+            </button>
+          )}
           <button className="btn-connect" onClick={() => onConnect(match)}>
             Connect →
+          </button>
+          <button className="btn-connect"
+            style={{ background: '#E8A23A' }}
+            onClick={() => onRate(match.user)}>
+            ⭐ Rate
           </button>
         </div>
       </div>
@@ -178,8 +178,9 @@ function MatchCard({ match, onConnect }) {
 
 function ConnectModal({ match, onClose }) {
   const [sent, setSent] = useState(false);
+  const firstName = match?.user?.name?.split(' ')[0] || 'Neighbour';
   const [message, setMessage] = useState(
-    `Hi ${match?.them.name?.split(' ')[0]}! I noticed we have a great skill match. I can help with ${match?.yourOffer.toLowerCase()}, and I'd love to learn ${match?.theirOffer.toLowerCase()} from you. Would you be open to a skill exchange?`
+    `Hi ${firstName}! I noticed we have a great skill match. Would you be open to a skill exchange?`
   );
 
   const handleSend = async () => {
@@ -195,17 +196,19 @@ function ConnectModal({ match, onClose }) {
         {sent ? (
           <div className="modal-sent">
             <div className="sent-icon">✉️</div>
-            <h3>Message sent to {match.them.name.split(' ')[0]}!</h3>
+            <h3>Message sent to {firstName}!</h3>
             <p>You'll get a notification when they respond.</p>
             <button className="btn-close-modal" onClick={onClose}>Done</button>
           </div>
         ) : (
           <>
             <div className="modal-header">
-              <div className="modal-avatar">{match.them.initials}</div>
+              <div className="modal-avatar">
+                {match.user?.name?.[0]?.toUpperCase() || '?'}
+              </div>
               <div>
-                <h3>Connect with {match.them.name}</h3>
-                <p>{match.them.neighbourhood} · {match.score}% match</p>
+                <h3>Connect with {match.user?.name}</h3>
+                <p>{match.user?.neighbourhood} · {match.score} score</p>
               </div>
               <button className="modal-close-btn" onClick={onClose}>✕</button>
             </div>
@@ -217,6 +220,10 @@ function ConnectModal({ match, onClose }) {
                 onChange={e => setMessage(e.target.value)}
                 rows={5}
               />
+              <div className="safety-tip" style={{ marginTop: '1rem' }}>
+                🛡️ <strong>Safety tip:</strong> Always meet in a public place first.
+                Never share personal address until you trust the person.
+              </div>
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={onClose}>Cancel</button>
@@ -230,99 +237,126 @@ function ConnectModal({ match, onClose }) {
 }
 
 export default function MyMatchesPage() {
-  const [filter, setFilter] = useState('all');
+  const { user } = useAuth();
+  const [matches, setMatches]                 = useState([]);
+  const [loading, setLoading]                 = useState(true);
+  const [error, setError]                     = useState(null);
+  const [filter, setFilter]                   = useState('all');
   const [connectingMatch, setConnectingMatch] = useState(null);
-  const loading = false; // replace with real loading state
+  const [reviewUser, setReviewUser]           = useState(null);
 
-  const filtered = MOCK_MATCHES.filter(m => {
-    if (filter === 'high')   return m.score >= 80;
-    if (filter === 'medium') return m.score >= 65 && m.score < 80;
+  useEffect(() => {
+    if (user) fetchMatches();
+  }, [user]);
+
+  async function fetchMatches() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`http://localhost:8000/matches/${user.id}`);
+      if (!res.ok) throw new Error('Failed to fetch matches');
+      const data = await res.json();
+      setMatches(data);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (!user) return (
+    <div style={{ padding: '3rem', textAlign: 'center' }}>
+      <h2>Please log in to see your matches</h2>
+      <a href="/login" style={{ color: '#C0692A' }}>Go to Login</a>
+    </div>
+  );
+
+  const filtered = matches.filter(m => {
+    if (filter === 'high')   return m.score >= 5;
+    if (filter === 'medium') return m.score >= 2 && m.score < 5;
     return true;
   });
+
+  const highCount   = matches.filter(m => m.score >= 5).length;
+  const mediumCount = matches.filter(m => m.score >= 2 && m.score < 5).length;
 
   return (
     <div className="matches-page">
       {connectingMatch && (
         <ConnectModal match={connectingMatch} onClose={() => setConnectingMatch(null)} />
       )}
+      {reviewUser && (
+        <ReviewModal user={reviewUser} onClose={() => setReviewUser(null)} />
+      )}
 
       <div className="matches-container">
-        {/* Header */}
         <div className="matches-header">
           <span className="matches-eyebrow">Powered by AI</span>
           <h1 className="matches-title">Your Matches</h1>
           <p className="matches-subtitle">
-            Our NLP engine found these mutual skill exchanges based on what you can offer and what you need.
+            Neighbours where you can help each other based on your skills.
           </p>
-
-          {/* Stats strip */}
           <div className="matches-stats">
-            <div className="stat-chip">
-              <strong>{MOCK_MATCHES.length}</strong> matches found
-            </div>
-            <div className="stat-chip high">
-              <strong>{MOCK_MATCHES.filter(m => m.score >= 80).length}</strong> excellent
-            </div>
-            <div className="stat-chip medium">
-              <strong>{MOCK_MATCHES.filter(m => m.score >= 65 && m.score < 80).length}</strong> good
-            </div>
+            <div className="stat-chip"><strong>{matches.length}</strong> matches found</div>
+            <div className="stat-chip high"><strong>{highCount}</strong> excellent</div>
+            <div className="stat-chip medium"><strong>{mediumCount}</strong> good</div>
           </div>
         </div>
 
-        {/* Filter tabs */}
         <div className="matches-filters">
           {[
             { key: 'all',    label: 'All Matches' },
-            { key: 'high',   label: '⭐ Excellent (80%+)' },
-            { key: 'medium', label: '👍 Good (65–79%)' },
+            { key: 'high',   label: '⭐ Excellent' },
+            { key: 'medium', label: '👍 Good' },
           ].map(f => (
-            <button
-              key={f.key}
+            <button key={f.key}
               className={`filter-tab ${filter === f.key ? 'active' : ''}`}
-              onClick={() => setFilter(f.key)}
-            >
+              onClick={() => setFilter(f.key)}>
               {f.label}
             </button>
           ))}
         </div>
 
-        {/* Match list */}
         {loading ? (
           <div className="matches-loading">
-            {[1, 2, 3].map(i => <div key={i} className="match-skeleton" />)}
+            {[1,2,3].map(i => <div key={i} className="match-skeleton" />)}
+          </div>
+        ) : error ? (
+          <div className="matches-empty">
+            <p className="empty-icon">⚠️</p>
+            <h3>Could not load matches</h3>
+            <p>{error}</p>
+            <button onClick={fetchMatches} style={{ marginTop: '1rem', color: '#C0692A' }}>
+              Try again
+            </button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="matches-empty">
             <p className="empty-icon">🔍</p>
-            <h3>No matches in this range yet</h3>
-            <p>Try posting more skills to improve your matches.</p>
+            <h3>No matches yet</h3>
+            <p>Post some skills first and we'll find your matches!</p>
+            <a href="/post" style={{ color: '#C0692A', marginTop: '1rem', display: 'block' }}>
+              Post a skill →
+            </a>
           </div>
         ) : (
           <div className="matches-list">
             {filtered.map((match, i) => (
-              <div
-                key={match.id}
-                style={{ animationDelay: `${i * 0.08}s` }}
-                className="match-item-wrapper"
-              >
-                <MatchCard match={match} onConnect={setConnectingMatch} />
+              <div key={i} style={{ animationDelay: `${i * 0.08}s` }}
+                className="match-item-wrapper">
+                <MatchCard match={match} onConnect={setConnectingMatch} onRate={setReviewUser} />
               </div>
             ))}
           </div>
         )}
 
-        {/* How scoring works */}
         <div className="scoring-explainer">
           <h3>How matching works</h3>
-          <p>
-            Our AI reads your skill descriptions and finds neighbours where
-            <strong> you can help them AND they can help you</strong>. The score reflects
-            how well the exchange works both ways — higher means a tighter mutual fit.
-          </p>
+          <p>Our engine finds neighbours where <strong>you can help them AND they can help you</strong>.</p>
           <div className="score-legend">
-            <span className="legend-dot high" /> 80–100% Excellent
-            <span className="legend-dot medium" /> 65–79% Good
-            <span className="legend-dot low" /> Below 65% Possible
+            <span className="legend-dot high" /> High = Excellent
+            <span className="legend-dot medium" /> Medium = Good
+            <span className="legend-dot low" /> Low = Possible
           </div>
         </div>
       </div>

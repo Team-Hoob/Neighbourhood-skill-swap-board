@@ -109,3 +109,28 @@
   color: var(--terracotta-dark);
   text-decoration: underline;
 }
+
+.auth-section-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.5rem;
+}
+
+.auth-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e0d8cc;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #faf8f5;
+  color: #2c2c2c;
+  outline: none;
+  cursor: pointer;
+}
+
+.auth-select:focus {
+  border-color: #C0692A;
+}

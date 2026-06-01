@@ -8,19 +8,23 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('SESSION:', session)
       if (session?.user) {
-        await fetchUser(session.user.id)
+        fetchUser(session.user.id)
+      } else {
+        setLoading(false)
       }
-      setLoading(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
+        console.log('AUTH CHANGE:', _event, session)
         if (session?.user) {
-          await fetchUser(session.user.id)
+          fetchUser(session.user.id)
         } else {
           setUser(null)
+          setLoading(false)
         }
       }
     )
@@ -29,21 +33,35 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function fetchUser(id) {
-    const { data, error } = await supabase
-      .from('users')
-      .select('id, name, neighbourhood, avatar_url')
-      .eq('id', id)
-      .single()
+    console.log('FETCHING USER:', id)
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, name, neighbourhood, avatar_url')
+        .eq('id', id)
+        .single()
 
-    // If profile doesn't exist yet (e.g. still being inserted), just skip —
-    // RegisterPage will insert it and navigate() which re-triggers this.
-    if (!error && data) setUser(data)
+      console.log('USER DATA:', data, 'ERROR:', error)
+
+      if (data) {
+        setUser(data)
+      } else {
+        setUser({ id, name: 'User', neighbourhood: '', avatar_url: '' })
+      }
+    } catch(e) {
+      console.log('CATCH ERROR:', e)
+      setUser({ id, name: 'User', neighbourhood: '', avatar_url: '' })
+    } finally {
+      console.log('SETTING LOADING FALSE')
+      setLoading(false)
+    }
   }
 
-  async function signOut() {
-    await supabase.auth.signOut()
-    setUser(null)
-  }
+async function signOut() {
+  await supabase.auth.signOut()
+  setUser(null)
+  window.location.href = '/'
+}
 
   return (
     <AuthContext.Provider value={{ user, loading, signOut }}>

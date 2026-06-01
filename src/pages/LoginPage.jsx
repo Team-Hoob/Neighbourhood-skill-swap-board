@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useToast } from '../auth/ToastContext'
 import './LoginPage.css'
 
@@ -28,9 +28,10 @@ export default function LoginPage() {
       return
     }
 
-    setLoading(false)
-    showToast({ message: `Welcome back! You're now signed in.` })
-    navigate('/dashboard')
+    showToast({ message: `Welcome back!` })
+    
+    // Force hard redirect to home page
+    window.location.href = '/'
   }
 
   return (

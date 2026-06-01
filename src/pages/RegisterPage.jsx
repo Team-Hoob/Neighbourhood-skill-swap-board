@@ -4,22 +4,41 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useToast } from '../auth/ToastContext'
 import './RegisterPage.css'
 
+const INDIA_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
+  'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
+  'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Delhi', 'Jammu & Kashmir', 'Ladakh', 'Puducherry', 'Chandigarh'
+]
+
 export default function RegisterPage() {
-  const [email, setEmail]                 = useState('')
-  const [password, setPassword]           = useState('')
-  const [name, setName]                   = useState('')
+  const [email, setEmail]           = useState('')
+  const [password, setPassword]     = useState('')
+  const [name, setName]             = useState('')
+  const [country, setCountry]       = useState('India')
+  const [state, setState]           = useState('')
+  const [district, setDistrict]     = useState('')
   const [neighbourhood, setNeighbourhood] = useState('')
-  const [error, setError]                 = useState(null)
-  const [loading, setLoading]             = useState(false)
-  const navigate                          = useNavigate()
-  const { showToast }                     = useToast()
+  const [apartment, setApartment]   = useState('')
+  const [pincode, setPincode]       = useState('')
+  const [error, setError]           = useState(null)
+  const [loading, setLoading]       = useState(false)
+  const navigate                    = useNavigate()
+  const { showToast }               = useToast()
 
   async function handleRegister(e) {
     e.preventDefault()
     setError(null)
+
+    if (!/^\d{6}$/.test(pincode.trim())) {
+      setError('Please enter a valid 6-digit pincode')
+      return
+    }
+
     setLoading(true)
 
-    // Step 1: Sign up
     const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
 
     if (signUpError) {
@@ -28,20 +47,27 @@ export default function RegisterPage() {
       return
     }
 
-    // Step 2: No session means Supabase silently rejected (duplicate email)
     if (!data.session) {
       setError('This email is already registered. Please login instead.')
       setLoading(false)
       return
     }
 
-    // Step 3: Insert profile row
     const { error: insertError } = await supabase
       .from('users')
-      .insert([{ id: data.user.id, email, name, neighbourhood }])
+      .insert([{
+        id: data.user.id,
+        email,
+        name,
+        country,
+        state,
+        district,
+        neighbourhood,
+        apartment,
+        pincode: pincode.trim()
+      }])
 
     if (insertError) {
-      // If duplicate key, user already has a profile — still let them in
       if (!insertError.message.includes('duplicate')) {
         setError('Profile save failed: ' + insertError.message)
         setLoading(false)
@@ -49,10 +75,9 @@ export default function RegisterPage() {
       }
     }
 
-    // Step 4: Done
     setLoading(false)
     showToast({ message: 'Account created! Welcome to SkillSwap 🎉' })
-    navigate('/dashboard')
+    window.location.href = '/'
   }
 
   return (
@@ -61,6 +86,7 @@ export default function RegisterPage() {
         <h2>Create Account</h2>
         <p className="auth-subtitle">Join your neighbourhood skill exchange</p>
         <form className="auth-form" onSubmit={handleRegister}>
+
           <input
             type="text"
             placeholder="Full Name"
@@ -68,13 +94,63 @@ export default function RegisterPage() {
             onChange={(e) => setName(e.target.value)}
             required
           />
+
+          <div className="auth-section-label">📍 Your Location</div>
+
           <input
             type="text"
-            placeholder="Neighbourhood (e.g. Bandra West)"
+            placeholder="Country"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            required
+          />
+
+          <select
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            required
+            className="auth-select"
+          >
+            <option value="">Select State / UT</option>
+            {INDIA_STATES.map(s => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+
+          <input
+            type="text"
+            placeholder="District (e.g. Mumbai Suburban)"
+            value={district}
+            onChange={(e) => setDistrict(e.target.value)}
+            required
+          />
+
+          <input
+            type="text"
+            placeholder="Area / Neighbourhood (e.g. Bandra West)"
             value={neighbourhood}
             onChange={(e) => setNeighbourhood(e.target.value)}
             required
           />
+
+          <input
+            type="text"
+            placeholder="Apartment / Building (optional)"
+            value={apartment}
+            onChange={(e) => setApartment(e.target.value)}
+          />
+
+          <input
+            type="text"
+            placeholder="Pincode (e.g. 400050)"
+            value={pincode}
+            onChange={(e) => setPincode(e.target.value)}
+            maxLength={6}
+            required
+          />
+
+          <div className="auth-section-label">🔐 Account Details</div>
+
           <input
             type="email"
             placeholder="Email"
@@ -82,6 +158,7 @@ export default function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+
           <input
             type="password"
             placeholder="Password (min 6 characters)"
@@ -89,6 +166,7 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+
           {error && (
             <p className="auth-error">
               {error}{' '}
@@ -99,6 +177,7 @@ export default function RegisterPage() {
               )}
             </p>
           )}
+
           <button className="auth-btn" type="submit" disabled={loading}>
             {loading ? 'Creating account…' : 'Register'}
           </button>

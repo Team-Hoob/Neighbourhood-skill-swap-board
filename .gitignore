@@ -1,0 +1,17 @@
+# Environment files
+.env
+backend/.env
+
+# Node
+node_modules/
+
+# Python
+backend/__pycache__/
+*.pyc
+
+# Build files
+dist/
+build/
+
+# Vite
+node_modules/.vite/

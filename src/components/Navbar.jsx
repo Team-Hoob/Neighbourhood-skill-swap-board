@@ -1,16 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 import './Navbar.css';
-
-// Placeholder — will be replaced when Harshit Singh's Auth module is ready
-const useMockAuth = () => ({
-  user: null,
-  signOut: () => {},
-});
 
 export default function Navbar() {
   const location = useLocation();
-  const { user, signOut } = useMockAuth();
+  const { user, signOut } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -20,7 +15,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Close menu on route change
   useEffect(() => setMenuOpen(false), [location.pathname]);
 
   const navLinks = [

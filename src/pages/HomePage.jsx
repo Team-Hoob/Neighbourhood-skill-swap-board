@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 import './HomePage.css';
 
-/* ── Tiny hook: fires once when element enters viewport ── */
 function useInView(threshold = 0.15) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -19,7 +19,6 @@ function useInView(threshold = 0.15) {
   return [ref, visible];
 }
 
-/* ── Mock recent skills for the floating cards ── */
 const PREVIEW_SKILLS = [
   { id:1, type:'offer', name:'Ananya S.', neighbourhood:'Bandra', desc:'Python & data science tutoring', category:'Tech', emoji:'💻' },
   { id:2, type:'need',  name:'Rohan M.', neighbourhood:'Powai', desc:'Someone to fix my leaky tap', category:'Home', emoji:'🔧' },
@@ -30,30 +29,10 @@ const PREVIEW_SKILLS = [
 ];
 
 const STEPS = [
-  {
-    number: '01',
-    title: 'Post what you offer',
-    desc: 'Share a skill you have — coding, cooking, music, repairs, languages. Anything counts.',
-    icon: '📌',
-  },
-  {
-    number: '02',
-    title: 'Post what you need',
-    desc: 'Tell us what you\'re looking for. Our AI reads plain English, no categories needed.',
-    icon: '🔍',
-  },
-  {
-    number: '03',
-    title: 'AI finds your match',
-    desc: 'Our NLP engine finds neighbours where you can help each other — even with different words.',
-    icon: '⚡',
-  },
-  {
-    number: '04',
-    title: 'Exchange & grow',
-    desc: 'Connect, meet up, swap skills. No money changes hands — just community goodwill.',
-    icon: '🤝',
-  },
+  { number: '01', title: 'Post what you offer', desc: 'Share a skill you have — coding, cooking, music, repairs, languages. Anything counts.', icon: '📌' },
+  { number: '02', title: 'Post what you need', desc: "Tell us what you're looking for. Our AI reads plain English, no categories needed.", icon: '🔍' },
+  { number: '03', title: 'AI finds your match', desc: 'Our NLP engine finds neighbours where you can help each other — even with different words.', icon: '⚡' },
+  { number: '04', title: 'Exchange & grow', desc: 'Connect, meet up, swap skills. No money changes hands — just community goodwill.', icon: '🤝' },
 ];
 
 const STATS = [
@@ -63,10 +42,8 @@ const STATS = [
   { value: '98%',    label: 'Match satisfaction' },
 ];
 
-/* ════════════════════════════════════════════
-   COMPONENT
-════════════════════════════════════════════ */
 export default function HomePage() {
+  const { user } = useAuth();
   const [heroRef, heroVisible]   = useInView(0.1);
   const [stepsRef, stepsVisible] = useInView(0.1);
   const [cardsRef, cardsVisible] = useInView(0.1);
@@ -76,15 +53,13 @@ export default function HomePage() {
   return (
     <div className="home">
 
-      {/* ══════════ HERO ══════════ */}
+      {/* HERO */}
       <section className="hero" ref={heroRef}>
-        {/* Background texture blobs */}
         <div className="hero__blob hero__blob--1" aria-hidden="true" />
         <div className="hero__blob hero__blob--2" aria-hidden="true" />
         <div className="hero__blob hero__blob--3" aria-hidden="true" />
 
         <div className="container hero__inner">
-          {/* Left: copy */}
           <div className={`hero__copy ${heroVisible ? 'hero__copy--visible' : ''}`}>
             <div className="hero__eyebrow">
               <span className="hero__eyebrow-dot" />
@@ -105,28 +80,52 @@ export default function HomePage() {
             </p>
 
             <div className="hero__actions">
-              <Link to="/register" className="btn btn--primary btn--lg">
-                Get started free
-                <span className="btn__arrow">→</span>
-              </Link>
-              <Link to="/board" className="btn btn--ghost btn--lg">
-                Browse skills
-              </Link>
+              {user ? (
+                <>
+                  <Link to="/post" className="btn btn--primary btn--lg">
+                    Post a Skill
+                    <span className="btn__arrow">→</span>
+                  </Link>
+                  <Link to="/board" className="btn btn--ghost btn--lg">
+                    Browse skills
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/register" className="btn btn--primary btn--lg">
+                    Get started free
+                    <span className="btn__arrow">→</span>
+                  </Link>
+                  <Link to="/board" className="btn btn--ghost btn--lg">
+                    Browse skills
+                  </Link>
+                </>
+              )}
             </div>
 
-            <div className="hero__trust">
-              <div className="hero__avatars">
-                {['A','R','P','D','M'].map((l,i) => (
-                  <div key={i} className="hero__avatar" style={{ '--i': i }}>{l}</div>
-                ))}
+            {user && (
+              <div className="hero__trust">
+                <p className="hero__trust-text">
+                  Welcome back, <strong>{user.name}</strong>! 👋
+                </p>
               </div>
-              <p className="hero__trust-text">
-                <strong>840+ matches</strong> made in Mumbai alone
-              </p>
-            </div>
+            )}
+
+            {!user && (
+              <div className="hero__trust">
+                <div className="hero__avatars">
+                  {['A','R','P','D','M'].map((l,i) => (
+                    <div key={i} className="hero__avatar" style={{ '--i': i }}>{l}</div>
+                  ))}
+                </div>
+                <p className="hero__trust-text">
+                  <strong>840+ matches</strong> made in Mumbai alone
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Right: floating skill cards */}
+          {/* Floating cards */}
           <div className={`hero__cards ${heroVisible ? 'hero__cards--visible' : ''}`} aria-hidden="true">
             <div className="hero__card hero__card--1">
               <span className="hero__card-emoji">💻</span>
@@ -152,7 +151,6 @@ export default function HomePage() {
                 <p className="hero__card-meta">Rohan · Powai</p>
               </div>
             </div>
-            {/* Match badge */}
             <div className="hero__match-badge">
               <span>⚡</span>
               <div>
@@ -163,14 +161,13 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Scroll hint */}
         <div className="hero__scroll" aria-hidden="true">
           <div className="hero__scroll-line" />
           <span>scroll</span>
         </div>
       </section>
 
-      {/* ══════════ STATS STRIP ══════════ */}
+      {/* STATS */}
       <section className="stats" ref={statsRef}>
         <div className="container stats__inner">
           {STATS.map(({ value, label }, i) => (
@@ -186,48 +183,36 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══════════ HOW IT WORKS ══════════ */}
+      {/* HOW IT WORKS */}
       <section className="steps" ref={stepsRef}>
         <div className="container">
           <div className={`section-header ${stepsVisible ? 'section-header--visible' : ''}`}>
             <p className="section-eyebrow">Simple as 1-2-3-4</p>
             <h2 className="section-title">How SkillSwap works</h2>
-            <p className="section-sub">
-              Post your skills, let our AI do the matching, then connect with neighbours.
-            </p>
+            <p className="section-sub">Post your skills, let our AI do the matching, then connect with neighbours.</p>
           </div>
-
           <div className={`steps__grid ${stepsVisible ? 'steps__grid--visible' : ''}`}>
             {STEPS.map(({ number, title, desc, icon }, i) => (
-              <div
-                key={number}
-                className="step-card"
-                style={{ '--delay': `${i * 100}ms` }}
-              >
+              <div key={number} className="step-card" style={{ '--delay': `${i * 100}ms` }}>
                 <div className="step-card__number">{number}</div>
                 <div className="step-card__icon">{icon}</div>
                 <h3 className="step-card__title">{title}</h3>
                 <p className="step-card__desc">{desc}</p>
-                {i < STEPS.length - 1 && (
-                  <div className="step-card__connector" aria-hidden="true">→</div>
-                )}
+                {i < STEPS.length - 1 && <div className="step-card__connector" aria-hidden="true">→</div>}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════ SKILL PREVIEW ══════════ */}
+      {/* SKILL PREVIEW */}
       <section className="preview" ref={cardsRef}>
         <div className="container">
           <div className={`section-header ${cardsVisible ? 'section-header--visible' : ''}`}>
             <p className="section-eyebrow">Live on the board</p>
             <h2 className="section-title">Skills in your neighbourhood</h2>
-            <p className="section-sub">
-              A live glimpse at what people are offering and looking for right now.
-            </p>
+            <p className="section-sub">A live glimpse at what people are offering and looking for right now.</p>
           </div>
-
           <div className={`preview__grid ${cardsVisible ? 'preview__grid--visible' : ''}`}>
             {PREVIEW_SKILLS.map((skill, i) => (
               <div
@@ -249,28 +234,19 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-
           <div className="preview__cta">
-            <Link to="/board" className="btn btn--outline btn--lg">
-              View all skills on the board →
-            </Link>
+            <Link to="/board" className="btn btn--outline btn--lg">View all skills on the board →</Link>
           </div>
         </div>
       </section>
 
-      {/* ══════════ AI FEATURE CALLOUT ══════════ */}
+      {/* AI SECTION */}
       <section className="ai-section">
         <div className="container ai-section__inner">
           <div className="ai-section__visual" aria-hidden="true">
-            <div className="ai-bubble ai-bubble--a">
-              <span>🎯</span> "I teach maths"
-            </div>
-            <div className="ai-bubble ai-bubble--b">
-              <span>🔗</span> 92% match
-            </div>
-            <div className="ai-bubble ai-bubble--c">
-              <span>📚</span> "Need math tutoring"
-            </div>
+            <div className="ai-bubble ai-bubble--a"><span>🎯</span> "I teach maths"</div>
+            <div className="ai-bubble ai-bubble--b"><span>🔗</span> 92% match</div>
+            <div className="ai-bubble ai-bubble--c"><span>📚</span> "Need math tutoring"</div>
             <div className="ai-line" />
           </div>
           <div className="ai-section__copy">
@@ -278,8 +254,6 @@ export default function HomePage() {
             <h2 className="section-title">AI that understands <em>meaning,</em> not just keywords</h2>
             <p className="section-sub">
               "Maths teaching" and "math tutoring" — our engine knows they're the same thing.
-              Using sentence embeddings, SkillSwap matches people even when they describe skills differently,
-              in any language or dialect.
             </p>
             <ul className="ai-section__list">
               {[
@@ -288,8 +262,7 @@ export default function HomePage() {
                 'Ranked by compatibility — best matches first',
               ].map(item => (
                 <li key={item} className="ai-section__list-item">
-                  <span className="ai-section__check">✓</span>
-                  {item}
+                  <span className="ai-section__check">✓</span>{item}
                 </li>
               ))}
             </ul>
@@ -297,29 +270,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══════════ FINAL CTA ══════════ */}
-      <section className="cta-section" ref={ctaRef}>
-        <div className={`cta-section__inner ${ctaVisible ? 'cta-section__inner--visible' : ''}`}>
-          <div className="cta-section__bg" aria-hidden="true" />
-          <div className="container cta-section__content">
-            <h2 className="cta-section__title">
-              Ready to swap skills<br />with your neighbourhood?
-            </h2>
-            <p className="cta-section__sub">
-              Join hundreds of people already exchanging skills across Mumbai.
-              It's free, it's local, it's community.
-            </p>
-            <div className="cta-section__actions">
-              <Link to="/register" className="btn btn--white btn--lg">
-                Create your free account →
-              </Link>
-              <Link to="/board" className="btn btn--ghost-white btn--lg">
-                Explore the board
-              </Link>
+      {/* FINAL CTA — only show if not logged in */}
+      {!user && (
+        <section className="cta-section" ref={ctaRef}>
+          <div className={`cta-section__inner ${ctaVisible ? 'cta-section__inner--visible' : ''}`}>
+            <div className="cta-section__bg" aria-hidden="true" />
+            <div className="container cta-section__content">
+              <h2 className="cta-section__title">
+                Ready to swap skills<br />with your neighbourhood?
+              </h2>
+              <p className="cta-section__sub">
+                Join hundreds of people already exchanging skills across Mumbai.
+                It's free, it's local, it's community.
+              </p>
+              <div className="cta-section__actions">
+                <Link to="/register" className="btn btn--white btn--lg">Create your free account →</Link>
+                <Link to="/board" className="btn btn--ghost-white btn--lg">Explore the board</Link>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
     </div>
   );
