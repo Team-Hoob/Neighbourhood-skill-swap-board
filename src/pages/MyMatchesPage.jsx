@@ -253,7 +253,7 @@ export default function MyMatchesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`http://localhost:8000/matches/${user.id}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/matches/${user.id}`);
       if (!res.ok) throw new Error('Failed to fetch matches');
       const data = await res.json();
       setMatches(data);
